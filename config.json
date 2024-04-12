@@ -1,0 +1,17 @@
+{
+    "session":{
+        "secret":"secret"
+    },
+    "application": {
+        "name": "Hans & ..."
+    },
+    "database": {
+        "host": "localhost",
+        "port": 5434,
+        "username": "hans",
+        "password": "fddfskhkdznfskopms",
+        "database": "hans"
+    }
+    
+    
+}
