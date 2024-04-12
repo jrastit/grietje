@@ -1,3 +1,3 @@
 #!/bin/bash
-cd .. && PORT=5606 NODE_ENV=development node server.js
+cd .. && NODE_ENV=development npx nodemon server.js
 # POST=8282 node server.js

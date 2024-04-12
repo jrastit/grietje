@@ -3,12 +3,14 @@ const cors = require("cors");
 const routes = require("./route");
 const config = require("./config.js");
 const sequelize = require("./database");
+const passport = require('passport')
+require('./service/passport')
 const app = express();
 var session = require("express-session");
 var SequelizeStore = require("connect-session-sequelize")(session.Store);
 
 var corsOptions = {
-  origin: "https://hans.fexhu.com/",
+  origin: "https://grietje.fexhu.com/",
 };
 
 app.use(
@@ -20,8 +22,16 @@ app.use(
     resave: false, // we support the touch method so per the express-session docs this should be set to false
     saveUninitialized: true,
     proxy: true, // if you do SSL outside of node.
+    /*
+    cookie: {
+      secure: true,
+    }
+    */
   })
 );
+app.use(passport.initialize())
+app.use(passport.session())
+
 
 sequelize.sync({ alter: true });
 

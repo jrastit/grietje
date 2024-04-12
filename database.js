@@ -13,6 +13,8 @@ const sequelize = new Sequelize(config.database.database, config.database.userna
   dialect: 'postgres',
   port: config.database.port,
   logging: false,
+  define: {},
+
 });
 
 sequelize.query("")
