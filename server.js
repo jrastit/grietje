@@ -1,11 +1,11 @@
 const express = require("express");
 const cors = require("cors");
-const routes = require("./routes");
+const routes = require("./route");
+const config = require("./config.js");
 const sequelize = require("./database");
 const app = express();
 var session = require("express-session");
 var SequelizeStore = require("connect-session-sequelize")(session.Store);
-const config = require("./config.js");
 
 var corsOptions = {
   origin: "https://hans.fexhu.com/",
