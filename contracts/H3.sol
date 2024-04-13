@@ -40,6 +40,7 @@ contract H3 is ERC721, ERC721Burnable {
 
     mapping(address => bool) private _member;
     mapping(address => bool) private _viewer;
+
     bool public isPublic = false;
     bool public isOpen = false;
 
