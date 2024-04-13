@@ -10,6 +10,8 @@ import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
 
 contract H3 is ERC721, ERC721Burnable, Ownable {
+    uint256 _h3_price;
+
     struct NFTMetadata {
         string name;
         string description;
@@ -28,8 +30,11 @@ contract H3 is ERC721, ERC721Burnable, Ownable {
     mapping(uint64 => uint256[]) private _h3_14;
 
     constructor(
-        address initialOwner
-    ) ERC721("H3", "H3") Ownable(initialOwner) {}
+        address initialOwner,
+        uint256 h3_price
+    ) ERC721("H3", "H3") Ownable(initialOwner) {
+        _h3_price = price;
+    }
 
     function createNFT(
         uint256 tokenId,
@@ -42,17 +47,43 @@ contract H3 is ERC721, ERC721Burnable, Ownable {
         uint64 h3_10,
         uint64 h3_12,
         uint64 h3_14
-    ) external onlyOwner {
+    ) external payable {
+        uint256 price = 0;
         _mint(msg.sender, tokenId);
         _setTokenMetadata(tokenId, metadata);
-        _h3_1[h3_1].push(tokenId);
-        _h3_2[h3_2].push(tokenId);
-        _h3_4[h3_4].push(tokenId);
-        _h3_6[h3_6].push(tokenId);
-        _h3_8[h3_8].push(tokenId);
-        _h3_10[h3_10].push(tokenId);
-        _h3_12[h3_12].push(tokenId);
-        _h3_14[h3_14].push(tokenId);
+        if (h3_1 != 0) {
+            _h3_1[h3_1].push(tokenId);
+            price += _h3_price * 128;
+        }
+        if (h3_2 != 0) {
+            _h3_2[h3_2].push(tokenId);
+            price += _h3_price * 64;
+        }
+        if (h3_4 != 0) {
+            _h3_4[h3_4].push(tokenId);
+            price += _h3_price * 32;
+        }
+        if (h3_6 != 0) {
+            _h3_6[h3_6].push(tokenId);
+            price += _h3_price * 16;
+        }
+        if (h3_8 != 0) {
+            _h3_8[h3_8].push(tokenId);
+            price += _h3_price * 8;
+        }
+        if (h3_10 != 0) {
+            _h3_10[h3_10].push(tokenId);
+            price += _h3_price * 4;
+        }
+        if (h3_12 != 0) {
+            _h3_12[h3_12].push(tokenId);
+            price += _h3_price * 2;
+        }
+        if (h3_14 != 0) {
+            _h3_14[h3_14].push(tokenId);
+            price += _h3_price;
+        }
+        require(msg.value >= price, "Insufficient funds");
     }
 
     function _setTokenMetadata(
@@ -67,6 +98,13 @@ contract H3 is ERC721, ERC721Burnable, Ownable {
     ) external view returns (NFTMetadata memory) {
         return _tokenMetadata[tokenId];
     }
+
+    function getTokenURI(
+        uint256 tokenId
+    ) external view returns (string memory) {
+        return computeMetadataURI(_tokenMetadata[tokenId]);
+    }
+
     function computeMetadataURI(
         NFTMetadata memory metadata
     ) internal pure returns (string memory) {
