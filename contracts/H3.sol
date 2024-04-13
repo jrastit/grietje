@@ -3,14 +3,15 @@ pragma solidity ^0.8.19;
 
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {ERC721Burnable} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
 
-contract H3 is ERC721, ERC721Burnable, Ownable {
+contract H3 is ERC721, ERC721Burnable {
     uint256 _h3_price;
+
+    address payable public owner;
 
     struct NFTMetadata {
         string name;
@@ -29,11 +30,9 @@ contract H3 is ERC721, ERC721Burnable, Ownable {
     mapping(uint64 => uint256[]) private _h3_12;
     mapping(uint64 => uint256[]) private _h3_14;
 
-    constructor(
-        address initialOwner,
-        uint256 h3_price
-    ) ERC721("H3", "H3") Ownable(initialOwner) {
-        _h3_price = price;
+    constructor(address initialOwner, uint256 h3_price) ERC721("H3", "H3") {
+        owner = payable(initialOwner);
+        _h3_price = h3_price;
     }
 
     function createNFT(
@@ -84,6 +83,7 @@ contract H3 is ERC721, ERC721Burnable, Ownable {
             price += _h3_price;
         }
         require(msg.value >= price, "Insufficient funds");
+        owner.transfer(msg.value);
     }
 
     function _setTokenMetadata(

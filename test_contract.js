@@ -8,8 +8,11 @@ describe("H3", function () {
     beforeEach(async function () {
         H3 = await ethers.getContractFactory("H3");
         [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
+        console.log("Owner %s", owner.address);
         h3 = await H3.deploy(owner.address, 100);
-        await h3.deployed();
+        await h3.waitForDeployment();
+        console.log("H3 address %s", await h3.getAddress());
+        expect(await h3.getAddress()).not.undefined;
     });
 
     describe("Deployment", function () {
@@ -29,7 +32,7 @@ describe("H3", function () {
                     position: "0,0,0"
                 },
                 0, 0, 0, 0, 0, 0, 0, 0,
-                { value: ethers.utils.parseEther("1") }
+                { value: 100 }
             );
 
             const metadata = await h3.getTokenMetadata(1);
