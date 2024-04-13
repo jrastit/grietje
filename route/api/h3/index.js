@@ -35,10 +35,21 @@ router.post('/contract', async (req, res) => {
     }).then((result) => {
         res.status(200).send({ 'contract': contract.toJSON() })
     }).catch((err) => {
-        res.status(500).send
+        res.status(500).send(err)
     });
     res.status(200).send({ 'user': req.user.toJSON() })
 })
 
+router.use(isAuthenticated)
+//Route
+router.post('/list', (req, res) => {
+    CONTRACT.findAll().then((result) => {
+        res.status(200).send({ 'contracts': result })
+    }
+    ).catch((err) => {
+        res.status(500).send(err)
+    }
+    );
+});
 
 export default router;

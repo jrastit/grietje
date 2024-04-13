@@ -43,4 +43,9 @@ const CONTRACT = sequelize.define('CONTRACT', {
     timestamps: true
 });
 
+CONTRACT.prototype.toJSON = function () {
+    var values = Object.assign({}, this.get());
+    return values;
+}
+
 module.exports = CONTRACT;

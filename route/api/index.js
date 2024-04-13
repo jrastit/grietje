@@ -9,6 +9,7 @@ const wallet = require("./wallet");
 router.use("/test", test);
 router.use("/user", user);
 router.use("/wallet", wallet);
+router.use("/contract", contract);
 
 router.get("/", (request, response) => {
   const status = {
