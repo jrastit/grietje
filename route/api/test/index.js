@@ -40,4 +40,22 @@ router.delete("/user", (request, response) => {
   }
 
 });
+
+router.delete("/wallets", (request, response) => {
+  try {
+    id = request.user.id;
+    WALLET.destroy({
+      where: {
+        userId: id,
+      },
+    }).then((result) => {
+      response.send({ 'wallets': { 'id': '0' } });
+    }).catch((err) => {
+      response.status(500).send(err);
+    });
+  } catch (err) {
+    response.status(500).send(err);
+  }
+});
+
 module.exports = router;

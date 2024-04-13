@@ -1,0 +1,7 @@
+{
+    "name": "grietje",
+    "script": "./start.sh",
+    "env": {
+        "NODE_ENV": "development"
+    }
+}
