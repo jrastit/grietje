@@ -1,5 +1,4 @@
 
-require("@oasisprotocol/sapphire-hardhat");
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
