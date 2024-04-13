@@ -19,7 +19,11 @@ router.put('/register', passport.authenticate('local.signup'), (req, res) => {
 
 //Logout Route
 router.post('/logout', (req, res) => {
-    req.logout()
+    req.logout(function (err) {  // logout of passport
+        req.session.destroy(function (err) { // destroy the session
+            res.send(); // send to the client
+        });
+    });
     res.status(200).send({ 'user': req.user?.toJSON() })
 })
 

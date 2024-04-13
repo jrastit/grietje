@@ -2,10 +2,10 @@ const express = require("express");
 
 const router = express.Router();
 
-const status = require("./status");
+const test = require("./test");
 const user = require("./user");
 
-router.use("/", status);
+router.use("/test", test);
 router.use("/user", user);
 
 router.get("/", (request, response) => {
