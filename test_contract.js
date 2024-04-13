@@ -9,7 +9,7 @@ describe("H3", function () {
         H3 = await ethers.getContractFactory("H3");
         [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
         console.log("Owner %s", owner.address);
-        h3 = await H3.deploy(owner.address, 100);
+        h3 = await H3.deploy(owner.address, "1 comunity", "1", true, true, 100);
         await h3.waitForDeployment();
         console.log("H3 address %s", await h3.getAddress());
         expect(await h3.getAddress()).not.undefined;
@@ -23,7 +23,7 @@ describe("H3", function () {
 
     describe("Transactions", function () {
         it("Should create a new NFT", async function () {
-            await h3.connect(addr1).createNFT(
+            await h3.connect(owner).createNFT(
                 1,
                 {
                     name: "Test NFT",
@@ -31,7 +31,7 @@ describe("H3", function () {
                     imageURI: "https://example.com/image.png",
                     position: "0,0,0"
                 },
-                0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 1,
                 { value: 100 }
             );
 

@@ -9,6 +9,14 @@ import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
 
 contract H3 is ERC721, ERC721Burnable {
+    event H3Community(
+        address owner,
+        string name,
+        string symbol,
+        bool isPublic,
+        bool isOpen
+    );
+
     uint256 _h3_price;
 
     address payable public owner;
@@ -30,9 +38,127 @@ contract H3 is ERC721, ERC721Burnable {
     mapping(uint64 => uint256[]) private _h3_12;
     mapping(uint64 => uint256[]) private _h3_14;
 
-    constructor(address initialOwner, uint256 h3_price) ERC721("H3", "H3") {
+    mapping(address => bool) private _member;
+    mapping(address => bool) private _viewer;
+    bool public isPublic = false;
+    bool public isOpen = false;
+
+    constructor(
+        address initialOwner,
+        string memory name,
+        string memory symbol,
+        bool _isPublic,
+        bool _isOpen,
+        uint256 h3_price
+    ) ERC721(name, symbol) {
         owner = payable(initialOwner);
         _h3_price = h3_price;
+        isPublic = _isPublic;
+        isOpen = _isOpen;
+        emit H3Community(owner, name, symbol, isPublic, isOpen);
+    }
+
+    function withdraw() external {
+        require(msg.sender == owner, "Only owner can call this function");
+        owner.transfer(address(this).balance);
+    }
+
+    modifier onlyMember() {
+        require(
+            isOpen == true ||
+                msg.sender == owner ||
+                _member[msg.sender] == true,
+            "Only members can call this function"
+        );
+        _;
+    }
+
+    modifier onlyviewer() {
+        require(
+            isPublic == true ||
+                msg.sender == owner ||
+                _member[msg.sender] == true ||
+                _viewer[msg.sender] == true,
+            "Only viewer can call this function"
+        );
+        _;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only owner can call this function");
+        _;
+    }
+
+    function addMember(address member) external onlyOwner {
+        _member[member] = true;
+    }
+
+    function removeMember(address member) external onlyOwner {
+        _member[member] = false;
+    }
+
+    function addViewse(address member) external onlyOwner {
+        _member[member] = true;
+    }
+
+    function removeViewer(address member) external onlyOwner {
+        _member[member] = false;
+    }
+
+    function i_am_viewer() external view returns (bool) {
+        return _viewer[msg.sender];
+    }
+
+    function i_am_member() external view returns (bool) {
+        return _member[msg.sender];
+    }
+
+    function getH3_1(
+        uint64 h3_1
+    ) external view onlyviewer returns (uint256[] memory) {
+        return _h3_1[h3_1];
+    }
+
+    function getH3_2(
+        uint64 h3_2
+    ) external view onlyviewer returns (uint256[] memory) {
+        return _h3_2[h3_2];
+    }
+
+    function getH3_4(
+        uint64 h3_4
+    ) external view onlyviewer returns (uint256[] memory) {
+        return _h3_4[h3_4];
+    }
+
+    function getH3_6(
+        uint64 h3_6
+    ) external view onlyviewer returns (uint256[] memory) {
+        return _h3_6[h3_6];
+    }
+
+    function getH3_8(
+        uint64 h3_8
+    ) external view onlyviewer returns (uint256[] memory) {
+        return _h3_8[h3_8];
+    }
+
+    function getH3_10(
+        uint64 h3_10
+    ) external view onlyviewer returns (uint256[] memory) {
+        return _h3_10[h3_10];
+    }
+
+    function getH3_12(
+        uint64 h3_12
+    ) external view onlyviewer returns (uint256[] memory) {
+        return _h3_12[h3_12];
+    }
+
+    function getH3_14(
+        uint64 h3_14
+    ) external view onlyviewer returns (uint256[] memory) {
+        return _h3_14[h3_14];
     }
 
     function createNFT(
@@ -46,7 +172,7 @@ contract H3 is ERC721, ERC721Burnable {
         uint64 h3_10,
         uint64 h3_12,
         uint64 h3_14
-    ) external payable {
+    ) external payable onlyMember {
         uint256 price = 0;
         _mint(msg.sender, tokenId);
         _setTokenMetadata(tokenId, metadata);
@@ -82,26 +208,29 @@ contract H3 is ERC721, ERC721Burnable {
             _h3_14[h3_14].push(tokenId);
             price += _h3_price;
         }
-        require(msg.value >= price, "Insufficient funds");
+        require(
+            msg.sender == owner || msg.value >= price,
+            "Insufficient funds"
+        );
         owner.transfer(msg.value);
     }
 
     function _setTokenMetadata(
         uint256 tokenId,
         NFTMetadata memory metadata
-    ) internal {
+    ) private {
         _tokenMetadata[tokenId] = metadata;
     }
 
     function getTokenMetadata(
         uint256 tokenId
-    ) external view returns (NFTMetadata memory) {
+    ) external view onlyviewer returns (NFTMetadata memory) {
         return _tokenMetadata[tokenId];
     }
 
     function getTokenURI(
         uint256 tokenId
-    ) external view returns (string memory) {
+    ) external view onlyMember returns (string memory) {
         return computeMetadataURI(_tokenMetadata[tokenId]);
     }
 
