@@ -9,7 +9,7 @@ const wallet = require("./wallet");
 router.use("/test", test);
 router.use("/user", user);
 router.use("/wallet", wallet);
-router.use("/contract", contract);
+router.use("/h3", h3);
 
 router.get("/", (request, response) => {
   const status = {

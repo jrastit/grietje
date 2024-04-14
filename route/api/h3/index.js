@@ -5,27 +5,19 @@ const CONTRACT = require("../../../model/contract");
 const WALLET = require("../../../model/wallet");
 const H3Contract = require("../../../service/h3_contract");
 const router = express.Router();
+const { getWallet, getSigner } = require("../../../service/wallet_service");
 
 router.use(isAuthenticated)
+router.use(getWallet)
+router.use(getSigner)
 //Route
 router.post('/contract', async (req, res) => {
-    userId = req.user.id;
-    address = req.body.address;
-    const wallet = await WALLET.findOne({
-        where: {
-            userId: userId,
-            address: address
-        }
-    });
-    if (wallet == null) {
-        res.status(404).send({ 'error': 'Wallet not found' });
-    }
-    community = req.body.community;
-    communitySymbol = req.body.communitySymbol;
-    isPublic = req.body.isPublic;
-    isOpen = req.body.isOpen;
-    h3Price = req.body.h3Price;
-    const contract = await H3Contract.deployContract(wallet, wallet.address, community, communitySymbol, isPublic, isOpen, h3Price);
+    const community = req.body.community;
+    const communitySymbol = req.body.communitySymbol;
+    const isPublic = req.body.isPublic;
+    const isOpen = req.body.isOpen;
+    const h3Price = req.body.h3Price;
+    const contract = await H3Contract.deployContract(signer, signer.address, community, communitySymbol, isPublic, isOpen, h3Price);
     CONTRACT.create({
         address: await contract.getContractAddress(),
         owner: wallet.address,
@@ -55,13 +47,17 @@ router.post('/list', (req, res) => {
 });
 
 router.use(isAuthenticated)
+router.use(getWallet)
+router.use(getSigner)
 //Route
 router.post('/h3', async (req, res) => {
     try {
-        latitud = req.params.latitud;
-        longitud = req.params.longitud;
-        level = req.params.level;
-        contract_id = req.params.contract_id;
+        const signer = req.signer;
+        const latitud = req.params.latitud;
+        const longitud = req.params.longitud;
+        const level = req.params.level;
+        const contract_id = req.params.contractId;
+
         contract_db_list = await CONTRACT.findOne(
             {
                 where: {
@@ -70,8 +66,8 @@ router.post('/h3', async (req, res) => {
             }
         );
         nft_list = [];
-        for (contract in contract_db_list) {
-            h3Contract = await H3Contract.connectContract(contract.address);
+        for (var contract in contract_db_list) {
+            const h3Contract = await H3Contract.connectContract(signer, contract.address);
             nft_list_contract = await h3Contract.get_full_H3(latitud, longitud, level);
             nft_list.concat(nft_list_contract);
         }
@@ -82,10 +78,12 @@ router.post('/h3', async (req, res) => {
 });
 
 router.use(isAuthenticated)
+router.use(getWallet)
 //Route
 router.post('/nft', async (req, res) => {
     try {
-        contract_id = req.params.contract_id;
+        const signer = req.signer;
+        const contract_id = req.params.contract_id;
         contract_db_list = await CONTRACT.findOne(
             {
                 where: {
@@ -94,8 +92,8 @@ router.post('/nft', async (req, res) => {
             }
         );
         nft_list = [];
-        for (contract in contract_db_list) {
-            h3Contract = await H3Contract.connectContract(contract.address);
+        for (var contract in contract_db_list) {
+            const h3Contract = await H3Contract.connectContract(signer, contract.address);
             nft_list_contract = await h3Contract.createNFTH3(
                 req.body.tokenId,
                 req.body.name,
