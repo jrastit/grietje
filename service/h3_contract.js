@@ -118,7 +118,7 @@ class H3Contract {
         for (let nft of nft_list) {
             const nft_full_array = await this.getTokenMetadata(nft);
             const nft_full = {
-                id: Number(nft),
+                id: Number(nft).toString(),
                 name: nft_full_array[0],
                 description: nft_full_array[1],
                 imageURI: nft_full_array[2],
