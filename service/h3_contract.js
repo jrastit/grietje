@@ -75,7 +75,7 @@ class H3Contract {
         return this.h3Contract.i_am_viewer();
     }
 
-    async convert_level(level) {
+    convert_level(level) {
         if (level == 0) return 0;
         if (level == 1) return 1;
         if (level == 2) return 2;
@@ -88,7 +88,7 @@ class H3Contract {
     }
 
     async get_nft_list(h3_index, h3_level) {
-        nft_list = [];
+        let nft_list = [];
         if (h3_level == 1) {
             nft_list = await this.h3Contract.getH3_1(h3_index);
         }
@@ -114,31 +114,45 @@ class H3Contract {
             nft_list = await this.h3Contract.getH3_14(h3_index);
         }
 
+        let nft_full_list = [];
         for (let nft of nft_list) {
-            nft.contract_address = this.h3Contract.address;
+            const nft_full_array = await this.getTokenMetadata(nft);
+            const nft_full = {
+                id: nft,
+                name: nft_full_array[0],
+                description: nft_full_array[1],
+                imageURI: nft_full_array[2],
+                position: nft_full_array[3],
+                contract: await this.h3Contract.getAddress()
+            }
+            console.log(nft_full);
+            nft_full_list.push(nft_full);
+
         }
-        return nft_list;
+        return nft_full_list;
 
     }
 
     async get_full_H3(latitud, longitud, level) {
-        h3_level = convert_level(level);
-        index = H3JS.latLngToCell(latitud, longitud, convert_level(h3_level));
+        const h3_level = this.convert_level(level);
+        const index = this.getH3Index(latitud, longitud, h3_level);
         const neighbours = H3JS.gridDisk(index, 1);
         neighbours.push(index);
-        ret = [];
+        let ret = [];
         for (let i = 0; i < neighbours.length; i++) {
             ret = ret.concat(await this.get_nft_list(neighbours[i], h3_level));
         }
-        for (let i = 0; i < ret.length; i++) {
-            ret[i] = await getTokenMetadata(ret[i]);
-        }
+        return ret;
+    }
+
+    getH3Index(latitud, longitud, level) {
+        return "0x" + H3JS.latLngToCell(latitud, longitud, level);
     }
 
     async createNFTH3(tokenId, name, description, imageURI, latitud, longitud, level_min, level_max) {
         const h3_min = this.convert_level(level_min);
         const h3_max = this.convert_level(level_max);
-
+        console.log("H3: %s %s", h3_min, h3_max);
         let h3_1 = 0;
         let h3_2 = 0;
         let h3_4 = 0;
@@ -147,14 +161,16 @@ class H3Contract {
         let h3_10 = 0;
         let h3_12 = 0;
         let h3_14 = 0;
-        if (h3_min <= 1 && h3_max >= 1) h3_1 = H3JS.latLngToCell(latitud, longitud, 1);
-        if (h3_min <= 2 && h3_max >= 2) h3_2 = H3JS.latLngToCell(latitud, longitud, 2);
-        if (h3_min <= 4 && h3_max >= 4) h3_4 = H3JS.latLngToCell(latitud, longitud, 4);
-        if (h3_min <= 6 && h3_max >= 6) h3_6 = H3JS.latLngToCell(latitud, longitud, 6);
-        if (h3_min <= 8 && h3_max >= 8) h3_8 = H3JS.latLngToCell(latitud, longitud, 8);
-        if (h3_min <= 10 && h3_max >= 10) h3_10 = H3JS.latLngToCell(latitud, longitud, 10);
-        if (h3_min <= 12 && h3_max >= 12) h3_12 = H3JS.latLngToCell(latitud, longitud, 12);
-        if (h3_min <= 14 && h3_max >= 14) h3_14 = H3JS.latLngToCell(latitud, longitud, 14);
+        if (h3_min <= 1 && h3_max >= 1) h3_1 = this.getH3Index(latitud, longitud, 1);
+        if (h3_min <= 2 && h3_max >= 2) h3_2 = this.getH3Index(latitud, longitud, 2);
+        if (h3_min <= 4 && h3_max >= 4) h3_4 = this.getH3Index(latitud, longitud, 4);
+        if (h3_min <= 6 && h3_max >= 6) h3_6 = this.getH3Index(latitud, longitud, 6);
+        if (h3_min <= 8 && h3_max >= 8) h3_8 = this.getH3Index(latitud, longitud, 8);
+        if (h3_min <= 10 && h3_max >= 10) h3_10 = this.getH3Index(latitud, longitud, 10);
+        if (h3_min <= 12 && h3_max >= 12) h3_12 = this.getH3Index(latitud, longitud, 12);
+        if (h3_min <= 14 && h3_max >= 14) h3_14 = this.getH3Index(latitud, longitud, 14);
+
+        console.log("H3: %s %s %s %s %s %s %s %s", h3_1, h3_2, h3_4, h3_6, h3_8, h3_10, h3_12, h3_14);
 
         await this.h3Contract.createNFT(tokenId, { name, description, imageURI, position: "(" + latitud + ', ' + longitud + ")" }, h3_1, h3_2, h3_4, h3_6, h3_8, h3_10, h3_12, h3_14);
 
