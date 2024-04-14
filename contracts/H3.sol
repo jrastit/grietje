@@ -17,6 +17,8 @@ contract H3 is ERC721, ERC721Burnable {
         bool isOpen
     );
 
+    uint256 private _tokenId = 1;
+
     uint256 _h3_price;
 
     address payable public owner;
@@ -163,7 +165,6 @@ contract H3 is ERC721, ERC721Burnable {
     }
 
     function createNFT(
-        uint256 tokenId,
         NFTMetadata memory metadata,
         uint64 h3_1,
         uint64 h3_2,
@@ -175,6 +176,7 @@ contract H3 is ERC721, ERC721Burnable {
         uint64 h3_14
     ) external payable onlyMember {
         uint256 price = 0;
+        uint256 tokenId = _tokenId++;
         _mint(msg.sender, tokenId);
         _setTokenMetadata(tokenId, metadata);
         if (h3_1 != 0) {

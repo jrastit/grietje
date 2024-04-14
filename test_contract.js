@@ -26,7 +26,6 @@ describe("H3", function () {
     describe("Transactions", function () {
         it("Should create a new NFT", async function () {
             await h3.connect(owner).createNFT(
-                1,
                 {
                     name: "Test NFT",
                     description: "This is a test NFT",
@@ -53,7 +52,7 @@ describe("H3", function () {
             expect(h3Contract).not.undefined;
             expect(h3Contract.h3Contract).not.undefined;
             console.log("H3 Contract %s", h3Contract.h3Contract);
-            await h3Contract.createNFTH3(1, "Test NFT", "This is a test NFT", "https://example.com/image.png", 52.370216, 4.895168, 1, 8);
+            await h3Contract.createNFTH3("Test NFT", "This is a test NFT", "https://example.com/image.png", 52.370216, 4.895168, 1, 8);
 
             const metadata = await h3Contract.getTokenMetadata(1);
             expect(metadata.name).to.equal("Test NFT");

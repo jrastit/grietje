@@ -149,7 +149,7 @@ class H3Contract {
         return "0x" + H3JS.latLngToCell(latitud, longitud, level);
     }
 
-    async createNFTH3(tokenId, name, description, imageURI, latitud, longitud, level_min, level_max) {
+    async createNFTH3(name, description, imageURI, latitud, longitud, level_min, level_max) {
         const h3_min = this.convert_level(level_min);
         const h3_max = this.convert_level(level_max);
         console.log("H3: %s %s", h3_min, h3_max);
@@ -172,13 +172,8 @@ class H3Contract {
 
         console.log("H3: %s %s %s %s %s %s %s %s", h3_1, h3_2, h3_4, h3_6, h3_8, h3_10, h3_12, h3_14);
 
-        await this.h3Contract.createNFT(tokenId, { name, description, imageURI, position: "(" + latitud + ', ' + longitud + ")" }, h3_1, h3_2, h3_4, h3_6, h3_8, h3_10, h3_12, h3_14);
+        await this.h3Contract.createNFT({ name, description, imageURI, position: "(" + latitud + ', ' + longitud + ")" }, h3_1, h3_2, h3_4, h3_6, h3_8, h3_10, h3_12, h3_14);
 
-    }
-
-
-    async createNFT(tokenId, name, description, imageURI, position, h3_1, h3_2, h3_4, h3_6, h3_8, h3_10, h3_12, h3_14) {
-        await this.h3Contract.createNFT(tokenId, { name, description, imageURI, position }, h3_1, h3_2, h3_4, h3_6, h3_8, h3_10, h3_12, h3_14);
     }
 
     async getTokenMetadata(tokenId) {
