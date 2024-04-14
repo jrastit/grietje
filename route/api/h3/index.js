@@ -1,9 +1,7 @@
-import { route } from "../test";
-
 const express = require("express");
 const CONTRACT = require("../../../model/contract");
-const WALLET = require("../../../model/wallet");
 const H3Contract = require("../../../service/h3_contract");
+const isAuthenticated = require('../../../service/is_authentificated');
 const router = express.Router();
 const { getWallet, getSigner } = require("../../../service/wallet_service");
 
@@ -53,26 +51,19 @@ router.use(getSigner)
 router.post('/h3', async (req, res) => {
     try {
         const signer = req.signer;
-        const latitud = req.params.latitud;
-        const longitud = req.params.longitud;
-        const level = req.params.level;
-        const contract_id = req.params.contractId;
+        const latitud = req.body.latitud;
+        const longitud = req.body.longitud;
+        const level = req.body.level;
+        const contract_id = req.body.contract;
 
-        contract_db_list = await CONTRACT.findOne(
-            {
-                where: {
-                    id: contract_id
-                }
-            }
-        );
-        nft_list = [];
-        for (var contract in contract_db_list) {
-            const h3Contract = await H3Contract.connectContract(signer, contract.address);
-            nft_list_contract = await h3Contract.get_full_H3(latitud, longitud, level);
-            nft_list.concat(nft_list_contract);
-        }
+        console.log("Get H3 %s %s %s %s", latitud, longitud, level, req.body);
+
+        const h3Contract = await H3Contract.connectContract(signer, contract_id);
+        nft_list = await h3Contract.get_full_H3(latitud, longitud, level);
+
         res.status(200).send({ 'nft_list': nft_list })
     } catch (err) {
+        console.error(err);
         res.status(500).send(err)
     }
 });
@@ -83,32 +74,35 @@ router.use(getWallet)
 router.post('/nft', async (req, res) => {
     try {
         const signer = req.signer;
-        const contract_id = req.params.contract_id;
-        contract_db_list = await CONTRACT.findOne(
+        console.log(req.body);
+        const contractAddress = req.body.contract;
+        /*
+        contract_db = await CONTRACT.findOne(
             {
                 where: {
-                    id: contract_id
+                    address: contract_id
                 }
             }
         );
-        nft_list = [];
-        for (var contract in contract_db_list) {
-            const h3Contract = await H3Contract.connectContract(signer, contract.address);
-            nft_list_contract = await h3Contract.createNFTH3(
-                req.body.tokenId,
-                req.body.name,
-                req.body.description,
-                req.body.imageURI,
-                req.body.latitud,
-                req.body.longitud,
-                req.body.level_min,
-                req.body.level_max,
-            );
-        }
+        */
+
+        const h3Contract = await H3Contract.connectContract(signer, contractAddress);
+        console.log("Mint nft %s", req.body.name);
+        await h3Contract.createNFTH3(
+            req.body.name,
+            req.body.description,
+            req.body.imageURI,
+            req.body.latitud,
+            req.body.longitud,
+            req.body.level_min,
+            req.body.level_max,
+        );
+        console.log("Minted nft %s", req.body.name);
         res.status(200).send({ 'status': 'ok' })
     } catch (err) {
+        console.error(err);
         res.status(500).send(err)
     }
 });
 
-export default router;
+module.exports = router;

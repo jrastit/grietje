@@ -1,4 +1,5 @@
-const hre = require("hardhat");
+const ethers = require("ethers");
+const sapphire = require("@oasisprotocol/sapphire-paratime");
 const WALLET = require("../model/wallet");
 
 const getUser = async (login) => {
@@ -15,37 +16,51 @@ const getSignerForUser = async (user) => {
             userId: user.id
         }
     });
-    const provider = hre.ethers.provider;
     const privKey = wallet.key;
-    const signer_wallet = new hre.ethers.Wallet(privKey);
-    const signer = signer_wallet.connect(provider);
+    const provider = new ethers.JsonRpcProvider('https://testnet.sapphire.oasis.io')
+    const signer = sapphire.wrap(
+        new ethers.Wallet(privKey, provider),
+    );
     return signer;
 }
 
 const getWallet = async (req, res, next) => {
-    const wallet = await WALLET.findOne({
-        where: {
-            userId: req.user.id
+    try {
+        console.log("get wallet for %s", req.user.id);
+        const wallet = await WALLET.findOne({
+            where: {
+                userId: req.user.id
+            }
+        });
+        if (wallet == null) {
+            res.status(404).send({ 'error': 'Wallet not found' });
         }
-    });
-    if (wallet == null) {
-        res.status(404).send({ 'error': 'Wallet not found' });
+        req.wallet = wallet;
+        next();
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ 'error': error });
     }
-    req.wallet = wallet;
-    next();
 }
 
 const getSigner = async (req, res, next) => {
-    const wallet = req.wallet;
-    const provider = hre.ethers.provider;
-    const privKey = wallet.key;
-    const signer_wallet = new hre.ethers.Wallet(privKey);
-    const signer = signer_wallet.connect(provider);
-    if (signer == null) {
-        res.status(404).send({ 'error': 'Signer not found' });
+    try {
+        console.log("get signer for %s", req.user.id);
+        const wallet = req.wallet;
+        const privKey = wallet.key;
+        const provider = new ethers.JsonRpcProvider('https://testnet.sapphire.oasis.io')
+        const signer = sapphire.wrap(
+            new ethers.Wallet(privKey, provider),
+        );
+        if (signer == null) {
+            res.status(404).send({ 'error': 'Signer not found' });
+        }
+        req.signer = signer;
+        next();
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ 'error': error });
     }
-    req.signer = signer;
-    next();
 }
 
 module.exports = { getSignerForUser, getWallet, getSigner, getUser };

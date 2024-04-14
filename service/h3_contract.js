@@ -118,7 +118,7 @@ class H3Contract {
         for (let nft of nft_list) {
             const nft_full_array = await this.getTokenMetadata(nft);
             const nft_full = {
-                id: nft,
+                id: Number(nft),
                 name: nft_full_array[0],
                 description: nft_full_array[1],
                 imageURI: nft_full_array[2],
@@ -134,6 +134,7 @@ class H3Contract {
     }
 
     async get_full_H3(latitud, longitud, level) {
+        console.log("get_full_H3 lat:%s long:%s %s", latitud, longitud, level);
         const h3_level = this.convert_level(level);
         const index = this.getH3Index(latitud, longitud, h3_level);
         const neighbours = H3JS.gridDisk(index, 1);
