@@ -1,3 +1,5 @@
+import { route } from "../test";
+
 const express = require("express");
 const CONTRACT = require("../../../model/contract");
 const WALLET = require("../../../model/wallet");
@@ -50,6 +52,65 @@ router.post('/list', (req, res) => {
         res.status(500).send(err)
     }
     );
+});
+
+router.use(isAuthenticated)
+//Route
+router.post('/h3', async (req, res) => {
+    try {
+        latitud = req.params.latitud;
+        longitud = req.params.longitud;
+        level = req.params.level;
+        contract_id = req.params.contract_id;
+        contract_db_list = await CONTRACT.findOne(
+            {
+                where: {
+                    id: contract_id
+                }
+            }
+        );
+        nft_list = [];
+        for (contract in contract_db_list) {
+            h3Contract = await H3Contract.connectContract(contract.address);
+            nft_list_contract = await h3Contract.get_full_H3(latitud, longitud, level);
+            nft_list.concat(nft_list_contract);
+        }
+        res.status(200).send({ 'nft_list': nft_list })
+    } catch (err) {
+        res.status(500).send(err)
+    }
+});
+
+router.use(isAuthenticated)
+//Route
+router.post('/nft', async (req, res) => {
+    try {
+        contract_id = req.params.contract_id;
+        contract_db_list = await CONTRACT.findOne(
+            {
+                where: {
+                    id: contract_id
+                }
+            }
+        );
+        nft_list = [];
+        for (contract in contract_db_list) {
+            h3Contract = await H3Contract.connectContract(contract.address);
+            nft_list_contract = await h3Contract.createNFTH3(
+                req.body.tokenId,
+                req.body.name,
+                req.body.description,
+                req.body.imageURI,
+                req.body.latitud,
+                req.body.longitud,
+                req.body.level_min,
+                req.body.level_max,
+            );
+        }
+        res.status(200).send({ 'status': 'ok' })
+    } catch (err) {
+        res.status(500).send(err)
+    }
 });
 
 export default router;
