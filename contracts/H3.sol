@@ -30,6 +30,28 @@ contract H3 is ERC721, ERC721Burnable {
         string position;
     }
 
+    struct NFTPosition {
+        uint64 h3_1;
+        uint64 h3_2;
+        uint64 h3_4;
+        uint64 h3_6;
+        uint64 h3_8;
+        uint64 h3_10;
+        uint64 h3_12;
+        uint64 h3_14;
+    }
+
+    struct NFT {
+        NFTMetadata metadata;
+        NFTPosition position;
+    }
+
+    struct NFTChain {
+        NFTChain prev;
+        NFTChain next;
+        uint256 tokenId;
+    }
+
     mapping(uint256 => NFTMetadata) private _tokenMetadata;
     mapping(uint64 => uint256[]) private _h3_1;
     mapping(uint64 => uint256[]) private _h3_2;
